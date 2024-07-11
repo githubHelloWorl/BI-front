@@ -1,9 +1,9 @@
-import {useEffect, useState} from "react";
-import {useModel} from "@umijs/max";
+import React, {useEffect, useState} from "react";
 import {genChartByAiUsingPost, listChartByPageUsingPost} from "@/services/BI/chartController";
 import {Button, Card, Col, Divider, Form, Input, message, Row, Select, Space, Spin, Upload} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import {UploadOutlined} from "@ant-design/icons";
+import ReactECharts from 'echarts-for-react';
 
 /**
  * 添加图表页面
@@ -113,14 +113,14 @@ const AddChart: React.FC = () => {
         <Col span={12}>
           <Card title="生成结论">
             {chart?.genResult ?? <div>请先在左侧进行提交分析</div>}
-            <Spin spinning={submitting} />
+            <Spin spinning={submitting}/>
           </Card>
           <Divider/>
           <Card title="可视化图表">
             {
               option ? <ReactECharts option={option}/> : <div>请先在左侧进行提交分析</div>
             }
-            <Spin spinning={submitting} />
+            <Spin spinning={submitting}/>
           </Card>
         </Col>
       </Row>
@@ -129,4 +129,5 @@ const AddChart: React.FC = () => {
     </div>
   );
 };
+
 export default AddChart;
