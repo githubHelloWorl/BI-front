@@ -11,14 +11,16 @@ import ReactECharts from 'echarts-for-react';
  */
 const AddChart: React.FC = () => {
   const [chart, setChart] = useState<API.BiResponse>();
-  const [submitting, setSubmitting] = useState<boolean>();
+  const [submitting, setSubmitting] = useState<boolean>(false);
   const [option, setOption] = useState<any>();
+
+// 使用JSON.stringify()将对象转换为JSON字符串
+
   /**
    * 提交
    * @param values
    */
   const onFinish = async (values: any) => {
-    console.log(values);
     // 避免重复提交
     if (submitting) {
       return;
@@ -35,23 +37,25 @@ const AddChart: React.FC = () => {
 
     try {
       const res = await genChartByAiUsingPost(params, {}, values.file.file.originFileObj);
-      console.log(res);
       if (!res?.data) {
-        message.error('分析失败')
+        message.error('分析失败', 1)
       } else {
-        message.success('分析成功')
-        const chartOption = JSON.parse(res.data.genChart ?? '');
+        const chartOption = JSON.parse(res.data.genChart ?? ''); // TODO
+        // const chartOption = res.data.genChart ?? '';
         if (!chartOption) {
           throw new Error("图表代码解析错误");
         } else {
           setChart(res.data);
           setOption(chartOption);
         }
+        message.success('分析成功', 1)
 
       }
 
     } catch (e: any) {
-      message.error('分析失败', e.message)
+      console.log("抛出错误", e.message);
+      message.error('分析失败', 1)
+      // message.error('分析失败2', 1, e.message)
     }
     setSubmitting(false);
   };
@@ -73,7 +77,7 @@ const AddChart: React.FC = () => {
                 <TextArea placeholder="请输入你的分析祈求。比如: 分析网站用户的增长情况"/>
               </Form.Item>
 
-              <Form.Item name="name" label="图表名称">
+              <Form.Item name="name" label="图表名称" rules={[{required: true, message: '请输入图表名称'}]}>
                 <Input placeholder="请输入图表名称"/>
               </Form.Item>
 
@@ -93,6 +97,7 @@ const AddChart: React.FC = () => {
               <Form.Item
                 name="file"
                 label="原始数据"
+                rules={[{required: true, message: '请输入分析数据(需要xlsx)'}]}
               >
                 <Upload name="file" maxCount={1}>
                   <Button icon={<UploadOutlined/>}>上传 CVS 文件</Button>
@@ -101,7 +106,7 @@ const AddChart: React.FC = () => {
 
               <Form.Item wrapperCol={{span: 16, offset: 4}}>
                 <Space>
-                  <Button type="primary" loading={submitting} disabled={submitting}>
+                  <Button type="primary" loading={submitting} disabled={submitting} htmlType="submit">
                     提交
                   </Button>
                   <Button htmlType="reset">重置</Button>
@@ -124,8 +129,6 @@ const AddChart: React.FC = () => {
           </Card>
         </Col>
       </Row>
-
-
     </div>
   );
 };

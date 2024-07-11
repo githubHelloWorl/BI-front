@@ -26,9 +26,11 @@ const MyChart: React.FC = () => {
 
   const loadData = async () => {
     try {
-      const res = await listMyChartByPageUsingPost();
+      const res = await listMyChartByPageUsingPost(searchParams);
+      console.log("获取的图表:")
+      console.log(res)
       if (res.data) {
-        setChartList(res.data.records ?? [])
+        setChartList(res?.data?.records ?? [])
         setTotal(res.data.total ?? 0);
 
         // 隐藏图表的 title
@@ -68,7 +70,7 @@ const MyChart: React.FC = () => {
           })
         }}/>
       </div>
-      <div  className="margin-16" />
+      <div className="margin-16"/>
       <List
         itemLayout="vertical"
         grid={{gutter: 16, xs: 1, sm: 1, md: 1, lg: 2, xl: 2, xxl: 2,}}
@@ -99,8 +101,8 @@ const MyChart: React.FC = () => {
               />
               <p>{'分析目标' + item.goal}</p>
 
-              <div className="margin-16" />
-              <ReactECharts option={JSON.parse(item.genChart ?? '{}')} />
+              <div className="margin-16"/>
+              <ReactECharts option={JSON.parse(item.genChart ?? '{}')}/>
             </Card>
           </List.Item>
         )}
@@ -111,7 +113,4 @@ const MyChart: React.FC = () => {
     </div>
   );
 };
-
-
-
 export default MyChart;
