@@ -41,14 +41,12 @@ const MyChart: React.FC = () => {
             data.genChart = JSON.stringify(chartOption);
           })
         }
-
       } else {
         message.error("其获取图表失败");
       }
     } catch (e: any) {
       message.error("获取我的图表错误")
     }
-
   }
 
   /**
