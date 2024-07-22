@@ -1,9 +1,12 @@
 import React, {useEffect, useState} from "react";
-import {genChartByAiUsingPost, listChartByPageUsingPost} from "@/services/BI/chartController";
-import {Button, Card, Col, Divider, Form, Input, message, Row, Select, Space, Spin, Upload} from "antd";
+import {
+  genChartByAiAsyncMqUsingPost, genChartByAiAsyncUsingPost,
+  genChartByAiUsingPost,
+  listChartByPageUsingPost
+} from "@/services/BI/chartController";
+import {Button, Card, Col, Radio, Form, Input, message, Row, Select, Space, Spin, Upload} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import {UploadOutlined} from "@ant-design/icons";
-import ReactECharts from 'echarts-for-react';
 import {useForm} from "rc-field-form";
 
 /**
@@ -11,7 +14,8 @@ import {useForm} from "rc-field-form";
  * @constructor
  */
 const AddChartAsync: React.FC = () => {
-  const [form] = useForm();
+  // const [form] = useForm();
+  const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState<boolean>(false);
 
 // 使用JSON.stringify()将对象转换为JSON字符串
@@ -25,6 +29,7 @@ const AddChartAsync: React.FC = () => {
     if (submitting) {
       return;
     }
+    // console.log(values);
     setSubmitting(true);
     // TODO 对接后端,上传数据
     const params = {
@@ -33,7 +38,15 @@ const AddChartAsync: React.FC = () => {
     };
 
     try {
-      const res = await genChartByAiUsingPost(params, {}, values.file.file.originFileObj);
+      let res: any = null;
+      if (values.radio === "线程池") {
+        res = await genChartByAiAsyncUsingPost(params, {}, values.file.file.originFileObj);
+        console.log("a")
+      } else if (values.radio === "rabbitMQ") {
+        res = await genChartByAiAsyncMqUsingPost(params, {}, values.file.file.originFileObj);
+        console.log("b")
+      }
+
       if (!res?.data) {
         message.error('分析失败', 1)
       } else {
@@ -50,19 +63,12 @@ const AddChartAsync: React.FC = () => {
   };
 
   return (
-    <div className="add-chart-async">
+    <div className="add-chart-async" style={{marginLeft: "10%", marginRight: "10%"}}>
       <Row gutter={24}>
-        <Col span={12}>
+        <Col span={24}>
           <Card title="智能分析">
-            <Form
-              form={form}
-              name="addChart"
-              onFinish={onFinish}
-              initialValues={{}}
-              labelAlign="left"
-              labelCol={{span: 4}}
-              wrapperCol={{span: 16}}
-            >
+            <Form form={form} name="addChart" onFinish={onFinish} initialValues={{}} labelAlign="left"
+                  labelCol={{span: 4}} wrapperCol={{span: 16}}>
               <Form.Item name="goal" label="分析目标" rules={[{required: true, message: '请输入分析目标'}]}>
                 <TextArea placeholder="请输入你的分析祈求。比如: 分析网站用户的增长情况"/>
               </Form.Item>
@@ -94,6 +100,14 @@ const AddChartAsync: React.FC = () => {
                 </Upload>
               </Form.Item>
 
+              {/*/!*添加使用哪个提交按钮 *!/*/}
+              <Form.Item name="radio"
+                         fieldId='type'
+                         label='使用技术'
+                         initialValue='线程池'>
+                <Radio.Group options={['线程池', 'rabbitMQ']}></Radio.Group>
+              </Form.Item>
+
               <Form.Item wrapperCol={{span: 16, offset: 4}}>
                 <Space>
                   <Button type="primary" loading={submitting} disabled={submitting} htmlType="submit">
@@ -106,6 +120,7 @@ const AddChartAsync: React.FC = () => {
           </Card>
         </Col>
       </Row>
+
     </div>
   );
 };

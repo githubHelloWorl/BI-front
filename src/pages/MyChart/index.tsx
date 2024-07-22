@@ -63,7 +63,7 @@ const MyChart: React.FC = () => {
 
   return (
     <div className="my-chart">
-      <div>
+      <div style={{ width: "30%", marginLeft: "35%" }}>
         <Search placeholder="请输入图表名称" enterButton onSearch={(value) => {
           // 设置搜索条件
           setSearchParams({
